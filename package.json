@@ -1,0 +1,31 @@
+{
+  "name": "@fcastrocs/steamcms",
+  "description": "Get lists of online Steam TCP and WS Content Management servers nearest to you.",
+  "version": "0.0.1",
+  "typings": "./@types/index.d.ts",
+  "main": "./lib/index.js",
+  "scripts": {
+    "prepare": "npm run build",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fcastrocs/SteamCMs.git"
+  },
+  "author": "Francisco Castro",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^22.5.5",
+    "typescript": "^5.6.2"
+  },
+  "dependencies": {
+    "@fcastrocs/steamclient": "^4.0.3"
+  },
+  "keywords": [
+    "steam cm",
+    "content management",
+    "steam servers",
+    "steam websocket",
+    "steam tcp"
+  ]
+}
