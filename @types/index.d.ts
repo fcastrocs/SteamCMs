@@ -44,7 +44,7 @@ export default abstract class SteamCMs {
   /**
    * Returns a list of alive TCP and WS closest to you
    */
-  static async getAliveLists();
+  static async getOnlineLists();
 
   /**
    * Returns a single alive TCP in a circular manner.

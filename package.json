@@ -1,7 +1,7 @@
 {
   "name": "@fcastrocs/steamcms",
   "description": "Get lists of online Steam TCP and WS Content Management servers nearest to you.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "typings": "./@types/index.d.ts",
   "main": "./lib/index.js",
   "scripts": {
