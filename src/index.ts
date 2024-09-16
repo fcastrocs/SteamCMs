@@ -4,10 +4,12 @@ import { LocationData, SteamCM_Response, SteamCM_WS_Response, SteamServers, Stea
 
 let tcpIndex = 0;
 let wsIndex = 0;
+let netFilterIndex = 0;
 
 const serverList: SteamServers = {
   tcp: [],
   ws: [],
+  netFilter: [],
 };
 
 export default abstract class SteamCMs {
@@ -22,6 +24,7 @@ export default abstract class SteamCMs {
 
     serverList.tcp = await SteamCMs.getAliveCms(servers.tcpServers, "tcp", cachedProtos);
     serverList.ws = await SteamCMs.getAliveCms(servers.webSockets, "ws", cachedProtos);
+    serverList.netFilter = await SteamCMs.getAliveCms(servers.netFilters, "tcp", cachedProtos);
 
     return serverList;
   }
@@ -32,7 +35,7 @@ export default abstract class SteamCMs {
    */
   static getNextTcp(): SteamServer {
     if (!serverList.tcp.length) {
-      throw new Error("Steam TCP CMs is empty");
+      throw new Error("Steam TCP CM list is empty");
     }
 
     return serverList.tcp[((tcpIndex++ % serverList.tcp.length) + serverList.tcp.length) % serverList.tcp.length];
@@ -44,10 +47,24 @@ export default abstract class SteamCMs {
    */
   static getNextWs(): SteamServer {
     if (!serverList.ws.length) {
-      throw new Error("Steam WS CMs is empty");
+      throw new Error("Steam WS CM list is empty");
     }
 
     return serverList.ws[((wsIndex++ % serverList.ws.length) + serverList.ws.length) % serverList.ws.length];
+  }
+
+  /**
+   * Returns an online netfilter SteamCM nearest to you.
+   * As you traverse the list, SteamCMs are further away.
+   */
+  static GetNextNetFilter(): SteamServer {
+    if (!serverList.ws.length) {
+      throw new Error("Steam netfilter CM list is empty");
+    }
+
+    return serverList.netFilter[
+      ((wsIndex++ % serverList.netFilter.length) + serverList.netFilter.length) % serverList.netFilter.length
+    ];
   }
 
   private static async getCellId() {
@@ -58,6 +75,7 @@ export default abstract class SteamCMs {
   private static async fetchLists(cellId: number) {
     const tcpUrl = `https://api.steampowered.com/ISteamDirectory/GetCMList/v1?cellid=${cellId}`;
     const webSocketUrl = `https://api.steampowered.com/ISteamDirectory/GetCMListForConnect/v1/?cmtype=websockets&realm=1`;
+    const netFiltersUrl = `https://api.steampowered.com/ISteamDirectory/GetCMListForConnect/v1/?cmtype=netfilter&realm=1`;
 
     const serverlistReponse: SteamCM_Response = await fetch(tcpUrl).then((res) => res.json());
     const tcpServers = serverlistReponse.response.serverlist.map((server) => {
@@ -69,15 +87,28 @@ export default abstract class SteamCMs {
     });
 
     const websocketResponse: SteamCM_WS_Response = await fetch(webSocketUrl).then((res) => res.json());
-    const webSockets = websocketResponse.response.serverlist.map((server) => {
-      const split = server.endpoint.split(":");
-      return {
-        host: split[0],
-        port: Number(split[1]),
-      };
-    });
+    const webSockets = websocketResponse.response.serverlist
+      .filter((server) => server.type === "websockets")
+      .map((server) => {
+        const split = server.endpoint.split(":");
+        return {
+          host: split[0],
+          port: Number(split[1]),
+        };
+      });
 
-    return { tcpServers, webSockets };
+    const netFilterResponse: SteamCM_WS_Response = await fetch(netFiltersUrl).then((res) => res.json());
+    const netFilters = netFilterResponse.response.serverlist
+      .filter((server) => server.type === "netfilter")
+      .map((server) => {
+        const split = server.endpoint.split(":");
+        return {
+          host: split[0],
+          port: Number(split[1]),
+        };
+      });
+
+    return { tcpServers, webSockets, netFilters };
   }
 
   private static async getAliveCms(

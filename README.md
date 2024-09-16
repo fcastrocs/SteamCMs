@@ -1,6 +1,6 @@
 # Steam CMs
 
-Get lists of online Steam TCP and WS Content Management servers nearest to you.
+Get lists of online Steam TCP, WS, and netfilter Content Management servers nearest to you.
 
 ## Installation
 
@@ -31,24 +31,31 @@ export interface SteamServer {
 export interface SteamServers {
   tcp: SteamServer[];
   ws: SteamServer[];
+  netFilter: SteamServer[];
 }
 
 export default abstract class SteamCMs {
   /**
-   * Returns a lists of online TCP and WS nearest to you.
+   * Returns a list of alive TCP and WS closest to you
    */
   static async getOnlineLists(): Promise<SteamServers>;
 
   /**
-   * Returns an online TCP SteamCM nearest to you.
-   * As you traverse the list, SteamCMs are further away.
+   * Returns a single alive TCP in a circular manner.
+   * As you traverse the list, SteamCMs are further away
    */
-  static getNextTcp(): SteamServer
+  static getNextTcp(): SteamServer;
 
   /**
-   * Returns an online WS SteamCM nearest to you.
+   * Returns a single alive WS in a circular manner.
+   * As you traverse the list, SteamCMs are further away
+   */
+  static getNextWs(): SteamServer;
+
+  /**
+   * Returns an online netfilter SteamCM nearest to you.
    * As you traverse the list, SteamCMs are further away.
    */
-  static getNextWs(): SteamServer
+  static GetNextNetFilter(): SteamServer;
 }
 ```
